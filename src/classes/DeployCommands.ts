@@ -16,7 +16,7 @@ export default class DeployCommands {
                 }
             }
 
-            if(guildIds.length === 0) {
+            if(guildIds.length != 0) {
                 const commands : RESTPostAPIApplicationCommandsJSONBody[] = []
                 const commandsPath : fs.PathLike = path.join(__dirname, '..', 'commands')
                 const commandFiles : string[] = fs.readdirSync(commandsPath).filter(file => file.endsWith('.ts'))
@@ -34,6 +34,6 @@ export default class DeployCommands {
                         .catch((error : any) : void => console.error('Error: ', error))
                 }
             } else console.error('Error: No guilds to deploy commands to')
-        } console.error('Error: Token/Client Id environment variable(s) are missing')
+        } else console.error('Error: Token/Client Id environment variable(s) are missing')
     }
 }

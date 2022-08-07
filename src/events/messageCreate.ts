@@ -1,4 +1,5 @@
 import { Message } from 'discord.js'
+import DeployCommands from '../classes/DeployCommands'
 import Event__c from '../classes/Event__c'
 
 const emoji : string = '!emoji'
@@ -17,10 +18,12 @@ export const event : Event__c = new Event__c(
             }
         }
 
-        if(guildIds.length !== 0 && message.guildId && !guildIds.includes(message.guildId)) {
+        if(guildIds.length != 0 && message.guildId && !guildIds.includes(message.guildId)) {
             const result : any = await salesforce.insert('GuildId__c', { Name : message.guildId })
             if(result.hasOwnProperty('id')) console.log(`Successfully added ${message.guild?.name} to the list of Servers`)
             else console.error('Error: ', result)
+
+            await DeployCommands.deploy()
         }
 
         if(message.client.user && message.client.user.id === message.author.id) return
