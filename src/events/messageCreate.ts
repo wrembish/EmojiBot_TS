@@ -1,61 +1,117 @@
-import { Message } from 'discord.js'
-import DeployCommands from '../classes/DeployCommands'
-import Event__c from '../classes/Event__c'
+import { EmbedBuilder, Message } from 'discord.js'
+import * as cron from 'node-cron'
+import { Collection as MongoCollection, Document, WithId } from 'mongodb'
+import { builtInMessages, cronJobs, database } from '../index'
+import DiscordEvent from '../classes/DiscordEvent'
+import { COMMANDCHAR, CRONCOLLECTION, DATABASEERRORMESSAGE, EMOJI , MONGODATABASE } from '../emojibot_files/constants'
+import { buildCronStr, convert, deleteCronJob, getDogFactsEmbed, getCatFactsEmbed } from '../emojibot_files/helpers'
+import CronJob from '../classes/CronJob'
 
-const emoji : string = '!emoji'
-
-export const event : Event__c = new Event__c(
+export const event : DiscordEvent = new DiscordEvent(
     'messageCreate',
     false,
     async (message : Message) : Promise<void> => {
-        let { salesforce } = require('../index.ts')
-        await salesforce.checkAuth()
-        const guildIds : string[] = []
-        const result : any = await salesforce.query('SELECT+Name+FROM+GuildId__c')
-        if(result.records) {
-            for(const record of result.records) {
-                guildIds.push(record.Name)
+        if(message.client.user?.id === message.author.id) return
+
+        const msg : string = message.content
+
+        if(msg.startsWith(EMOJI)) {
+            const content : string = msg.substring(EMOJI.length)
+            const convertedStr : string = convert(content)
+            await message.channel.send(convertedStr)
+        } else if(msg.includes('/grit')) {
+            const replyStr : string | undefined = builtInMessages.get('grit')
+            if (replyStr) await message.channel.send(replyStr)
+            else message.channel.send(DATABASEERRORMESSAGE)
+        } else if(msg.toUpperCase().includes('SUCK')) {
+            const replyStr : string | undefined = builtInMessages.get('succ')
+            if (replyStr) await message.channel.send(replyStr)
+            else await message.channel.send(DATABASEERRORMESSAGE)
+        } else if(msg === '69' || msg.startsWith('69 ') || msg.endsWith(' 69') || msg.includes(' 69 ')) {
+            const convertedStr : string = convert('69? nice')
+            await message.channel.send(convertedStr)
+        } else if(msg === '420' || msg.startsWith('420 ') || msg.endsWith(' 420') || msg.includes(' 420 ')) {
+            const convertedStr : string = convert('420? nice')
+            await message.channel.send(convertedStr)
+        } else if(msg.includes('/oof') || msg.includes('/bigoof')) {
+            const replyStr : string | undefined = builtInMessages.get('big_oof')
+            if (replyStr) message.channel.send(replyStr)
+            else message.channel.send(DATABASEERRORMESSAGE)
+        }
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+        //                                          New Features                                          //
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+        else if(msg.startsWith(`${COMMANDCHAR}set channel dogfacts `)) {
+            const collection : MongoCollection | undefined = database?.db(MONGODATABASE).collection(CRONCOLLECTION)
+            const cronDeleted : boolean = await deleteCronJob(message, collection, 'dogfacts')
+
+            const timeStr : string = msg.substring(`${COMMANDCHAR}set channel dogfacts `.length)
+            if(timeStr.endsWith('AM') || timeStr.endsWith('PM')) {
+                const cronStr : string = buildCronStr(timeStr)
+
+                await collection?.insertOne({ ChannelId : message.channelId, JobName : 'dogfacts', CronStr : cronStr })
+                const mongoJob : WithId<Document>[] | undefined = await collection?.find({ ChannelId : message.channelId, JobName : 'dogfacts' }).toArray()
+
+                const cronJob : cron.ScheduledTask = cron.schedule(cronStr, async () : Promise<void> => {
+                    const messageEmbed : EmbedBuilder = await getDogFactsEmbed()
+                    await message.channel.send({ embeds : [messageEmbed] })
+                })
+
+                if(mongoJob) {
+                    cronJobs.push(new CronJob(
+                        mongoJob[0]._id,
+                        message.channelId,
+                        cronStr,
+                        'dogfacts',
+                        cronJob
+                    ))
+                }
+                if (cronDeleted) await message.channel.send(`**Channel successfully rescheduled to recieve a random dogfact daily at __${timeStr}__**`)
+                else await message.channel.send(`**Channel successfully set to receive a random dogfact daily at __${timeStr}__**`)
             }
+        } else if(msg === `${COMMANDCHAR}remove channel dogfacts`) {
+            const collection : MongoCollection | undefined = database?.db(MONGODATABASE).collection(CRONCOLLECTION)
+            const cronDeleted : boolean = await deleteCronJob(message, collection, 'dogfacts')
+
+            if (cronDeleted) await message.channel.send('**Successfully removed this channel from recieving daily dogfacts**')
+            else await message.channel.send('**This channel isn\'t currently receiving daily dogfacts**')
         }
 
-        if(guildIds.length != 0 && message.guildId && !guildIds.includes(message.guildId)) {
-            const result : any = await salesforce.insert('GuildId__c', { Name : message.guildId })
-            if(result.hasOwnProperty('id')) console.log(`Successfully added ${message.guild?.name} to the list of Servers`)
-            else console.error('Error: ', result)
+        else if(msg.startsWith(`${COMMANDCHAR}set channel catfacts `)) {
+            const collection : MongoCollection | undefined = database?.db(MONGODATABASE).collection(CRONCOLLECTION)
+            const cronDeleted : boolean = await deleteCronJob(message, collection, 'catfacts')
 
-            await DeployCommands.deploy()
-        }
+            const timeStr : string = msg.substring(`${COMMANDCHAR}set channel catfacts `.length)
+            if(timeStr.endsWith('AM') || timeStr.endsWith('PM')) {
+                const cronStr : string = buildCronStr(timeStr)
 
-        if(message.client.user && message.client.user.id === message.author.id) return
+                await collection?.insertOne({ ChannelId : message.channelId, JobName : 'catfacts', CronStr : cronStr })
+                const mongoJob : WithId<Document>[] | undefined = await collection?.find({ ChannelId : message.channelId, JobName : 'catfacts' }).toArray()
 
-        const content : string = message.content
+                const cronJob : cron.ScheduledTask = cron.schedule(cronStr, async () : Promise<void> => {
+                    const messageEmbed : EmbedBuilder = await getCatFactsEmbed()
+                    await message.channel.send({ embeds : [messageEmbed] })
+                })
 
-        if(content.startsWith(emoji)) {
-            const contentMessage : string = content.substring(emoji.length)
-            if(contentMessage.length !== 0) {
-                const result : any = await salesforce.doPost('services/apexrest/Convert', { 'StrToConvert' : contentMessage })
-                await message.channel.send(result)
+                if(mongoJob) {
+                    cronJobs.push(new CronJob(
+                        mongoJob[0]._id,
+                        message.channelId,
+                        cronStr,
+                        'catfacts',
+                        cronJob
+                    ))
+                }
+
+                if (cronDeleted) await message.channel.send(`**Channel successfully rescheduled to receive a random catfact daily at __${timeStr}__**`)
+                else await message.channel.send(`**Channel successfully set to receive a random catfact daily at __${timeStr}__**`)
             }
-        } else if(content.includes('/grit')) {
-            const { grit } = require('../emojibot_files/builtInMessages.json')
-            if(grit) await message.channel.send(grit)
-            else await message.channel.send('Something went wrong')
-        } else if(content.toUpperCase().includes('SUCK')) {
-            const { succ } = require('../emojibot_files/builtInMessages.json')
-            if(succ) await message.channel.send(succ)
-            else await message.channel.send('Something went wrong')
-        } else if(content === '69' || content.startsWith('69 ') || content.endsWith(' 69') || content.includes(' 69 ')) {
-            await salesforce.checkAuth()
-            const result : any = await salesforce.doPost('services/apexrest/Convert', { 'StrToConvert' : '69? nice' })
-            await message.channel.send(result)
-        } else if(content === '420' || content.startsWith('420 ') || content.endsWith(' 420') || content.includes(' 420 ')) {
-            await salesforce.checkAuth()
-            const result : any = await salesforce.doPost('services/apexrest/Convert', { 'StrToConvert' : '420? nice' })
-            await message.channel.send(result)
-        } else if(content.includes('/oof') || content.includes('/bigoof')) {
-            const { big_oof } = require('../emojibot_files/builtInMessages.json')
-            if(big_oof) await message.channel.send(big_oof)
-            else await message.channel.send('Something went wrong')
+        } else if(msg === `${COMMANDCHAR}remove channel catfacts`) {
+            const collection : MongoCollection | undefined = database?.db(MONGODATABASE).collection(CRONCOLLECTION)
+            const cronDeleted : boolean = await deleteCronJob(message, collection, 'catfacts')
+
+            if (cronDeleted) await message.channel.send('**Successfully removed this channel from receiving daily catfacts**')
+            else await message.channel.send('**This channel isn\'t currently receiving daily catfacts**')
         }
     }
 )

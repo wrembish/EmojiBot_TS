@@ -1,18 +1,28 @@
 {
   "name": "emojibot_ts",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "description": "Converting Emojibot_JS to typescript",
-  "main": "src/index.ts",
+  "main": "dist/index.js",
   "scripts": {
-    "prestart": "ts-node src/deploy-commands.ts",
-    "start": "ts-node src/index.ts",
-    "test": "ts-node src/index.ts"
+    "prestart": "npx tsc",
+    "start": "node dist/index.js",
+    "predev": "ts-node src/deploy-commands.ts",
+    "dev": "nodemon src/index.ts",
+    "import": "ts-node database-imports/import.ts",
+    "predeploy-comms": "npx tsc",
+    "deploy-comms": "node dist/deploy-commands.js"
+    
   },
   "author": "William Rembish",
   "license": "ISC",
   "dependencies": {
-    "discord.js": "^14.1.2",
+    "discord.js": "^14.2.0",
     "dotenv": "^16.0.1",
+    "mongodb": "^4.9.0",
+    "node-cron": "^3.0.2"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.19",
     "ts-node": "^10.9.1",
     "typescript": "^4.7.4"
   }

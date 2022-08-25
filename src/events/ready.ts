@@ -1,11 +1,48 @@
-import { Client } from 'discord.js'
-import Event__c from '../classes/Event__c'
+import * as cron from 'node-cron'
+import { getDogFactsEmbed, getCatFactsEmbed } from '../emojibot_files/helpers'
+import { MONGODATABASE, CRONCOLLECTION } from '../emojibot_files/constants'
+import DiscordEvent from '../classes/DiscordEvent'
+import { Client, EmbedBuilder, TextChannel } from 'discord.js'
+import { Collection as MongoCollection, Document, WithId } from 'mongodb'
+import { cronJobs, database } from '..'
+import CronJob from '../classes/CronJob'
 
-export const event : Event__c = new Event__c(
+export const event : DiscordEvent = new DiscordEvent(
     'ready',
     true,
-    (client : Client) : void => {
-        if(client.user) console.log(`Ready! Logged in as ${client.user.tag}`)
-        else console.error('Something went wrong')
+    async (client : Client) : Promise<void> => {
+        // alert the console when the client is ready
+        console.log(`Ready! Logged in as ${client.user?.tag}`)
+
+        // Retrieve any cron jobs from the database and schedule them
+        // once the client is ready
+        const collection : MongoCollection | undefined = database?.db(MONGODATABASE).collection(CRONCOLLECTION)
+        const documents : WithId<Document>[] | undefined = await collection?.find({}).toArray()
+
+        if(documents) {
+            for(const doc of documents) {
+                const cronJob : cron.ScheduledTask = cron.schedule(doc.CronStr, async () : Promise<void> => {
+                    if(doc.JobName === 'dogfacts') {
+                        const messageEmbed : EmbedBuilder = await getDogFactsEmbed()
+                        const channel : TextChannel | undefined = client.channels.cache.get(doc.ChannelId) as TextChannel
+                        channel.send({ embeds : [messageEmbed] })
+                    } else if(doc.JobName === 'catfacts') {
+                        const messageEmbed : EmbedBuilder = await getCatFactsEmbed()
+                        const channel : TextChannel | undefined = client.channels.cache.get(doc.ChannelId) as TextChannel
+                        channel.send({ embeds : [messageEmbed] })
+                    }
+                })
+
+                cronJobs.push(new CronJob(
+                    doc._id,
+                    doc.ChannelId,
+                    doc.CronStr,
+                    doc.JobName,
+                    cronJob
+                ))
+            }
+
+            console.log(`${cronJobs.length} Cron Jobs have been scheduled successfully!`)
+        }
     }
 )

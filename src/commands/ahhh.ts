@@ -1,12 +1,14 @@
 import { ModalSubmitInteraction } from 'discord.js'
 import Command from '../classes/Command'
+import { DATABASEERRORMESSAGE } from '../emojibot_files/constants'
+import { builtInMessages } from '../index'
 
 export const command : Command = new Command(
     'ahhh',
     'ahhh',
     async (interaction : ModalSubmitInteraction) : Promise<void> => {
-        const { ahhh } = require('../emojibot_files/builtInMessages.json')
-        if(ahhh) await interaction.reply(ahhh)
-        else await interaction.reply('Something went wrong')
+        const replyStr : string | undefined = builtInMessages.get('ahhh')
+        if (replyStr) await interaction.reply(replyStr)
+        else await interaction.reply({ content : DATABASEERRORMESSAGE, ephemeral : true })
     }
 )

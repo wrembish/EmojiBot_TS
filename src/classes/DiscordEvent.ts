@@ -1,4 +1,4 @@
-export default class Event__c {
+export default class DiscordEvent {
     public name : string
     public once : boolean
     public execute : Function
