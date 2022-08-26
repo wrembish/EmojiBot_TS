@@ -3,20 +3,23 @@ import * as path from 'node:path'
 import { EmbedBuilder, Message, REST } from 'discord.js'
 import { Collection as MongoCollection } from 'mongodb'
 import { RESTPostAPIApplicationCommandsJSONBody, Routes } from 'discord-api-types/v10'
-import { conversionMap, cronJobs } from '../index'
 import { EMBEDCOLOR } from './constants'
 
 /**
  * Converts the given string into a string of emojis
- * @param {Object} map the conversion object that maps chars to emojis
  * @param {string} str the string to convert
  * @returns the converted string of emojis
  */
 export function convert(str: string): string {
+    const { conversionMap } = require('../index')
     let output: string = ''
     for (const c of str.split('')) {
         if (c === ' ') output += '     '
-        else output += conversionMap[c.toUpperCase()][Math.floor(Math.random() * conversionMap[c.toUpperCase()].length)] + ' '
+        else {
+            const emojis : string[] | undefined = conversionMap.get(c.toUpperCase())
+            if(emojis) output += emojis[Math.floor(Math.random() * emojis.length)] + ' '
+            else output += '     '
+        }
     }
 
     return output
@@ -144,6 +147,7 @@ export async function getCatFactsEmbed(): Promise<any> {
  * @returns true if a job is deleted, false otherwise
  */
 export async function deleteCronJob(message: Message, collection: MongoCollection | undefined, jobName: string): Promise<boolean> {
+    const { cronJobs } = require('../index')
     let index : number | undefined = undefined
     for (let i : number = 0; i < cronJobs.length; ++i) {
         const job = cronJobs[i]

@@ -3,10 +3,11 @@ import * as fs from 'node:fs'
 import * as path from 'node:path'
 import { REST } from 'discord.js'
 import { RESTPostAPIApplicationCommandsJSONBody, Routes } from 'discord-api-types/v10'
+import Command from './classes/Command'
 
 const commands : RESTPostAPIApplicationCommandsJSONBody[] = []
 const commandsPath : fs.PathLike = path.join(__dirname, 'commands')
-const commandFiles : string[] = fs.readdirSync(commandsPath).filter(file => file.endsWith('.js'))
+const commandFiles : string[] = fs.readdirSync(commandsPath).filter(file => file.endsWith('.ts') || file.endsWith('.js'))
 
 for(const file of commandFiles) {
     const filePath : string = path.join(commandsPath, file)

@@ -4,7 +4,6 @@ import * as path from 'node:path'
 import { DATABASEERRORMESSAGE } from '../emojibot_files/constants'
 import { deployCommands } from '../emojibot_files/helpers'
 import Command from '../classes/Command'
-import { commands, builtInMessages } from '../index'
 
 export const command : Command = new Command(
     'update',
@@ -12,6 +11,7 @@ export const command : Command = new Command(
     async (interaction : ModalSubmitInteraction) : Promise<void> => {
         // Only let the set admin run this command
         if(process.env.ADMIN && interaction.user.id === process.env.ADMIN) {
+            const { commands, builtInMessages } = require('../index')
             try {
                 await deployCommands()
 

@@ -1,10 +1,10 @@
 import * as cron from 'node-cron'
+import { Client, EmbedBuilder, TextChannel } from 'discord.js'
+import { Collection as MongoCollection, Document, WithId } from 'mongodb'
 import { getDogFactsEmbed, getCatFactsEmbed } from '../emojibot_files/helpers'
 import { MONGODATABASE, CRONCOLLECTION } from '../emojibot_files/constants'
 import DiscordEvent from '../classes/DiscordEvent'
-import { Client, EmbedBuilder, TextChannel } from 'discord.js'
-import { Collection as MongoCollection, Document, WithId } from 'mongodb'
-import { cronJobs, database } from '..'
+import { cronJobs, database } from '../index'
 import CronJob from '../classes/CronJob'
 
 export const event : DiscordEvent = new DiscordEvent(

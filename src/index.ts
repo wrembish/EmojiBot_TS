@@ -1,7 +1,7 @@
 require('dotenv').config()
 import * as fs from 'node:fs'
 import * as path from 'node:path'
-import { Client as DiscordClient, Collection, GatewayIntentBits } from 'discord.js'
+import { Awaitable, Client as DiscordClient, Collection, GatewayIntentBits } from 'discord.js'
 import { Collection as MongoCollection, Document, MongoClient, ServerApiVersion, WithId } from 'mongodb'
 import { MONGODATABASE, MAPCOLLECTION, MESSAGESCOLLECTION } from './emojibot_files/constants'
 import Command from './classes/Command'
@@ -24,13 +24,13 @@ for(const file of commandFiles) {
 }
 
 const eventsPath : fs.PathLike = path.join(__dirname, 'events')
-const eventFiles : string[] = fs.readdirSync(eventsPath).filter(file => file.endsWith('.js'))
+const eventFiles : string[] = fs.readdirSync(eventsPath).filter(file => file.endsWith('.ts') || file.endsWith('.js'))
 
 for(const file of eventFiles) {
     const filePath : string = path.join(eventsPath, file)
     const { event } = require(filePath)
-    if (event.once) client.once(event.name, (...args) => event.execute(...args))
-    else client.on(event.name, (...args) => event.execute(...args))
+    if (event.once) client.once(event.name, (...args) : Awaitable<void> => event.execute(...args))
+    else client.on(event.name, (...args) : Awaitable<void> => event.execute(...args))
 }
 
 let db : MongoClient | undefined
@@ -65,7 +65,9 @@ if(process.env.MONGODB_URL) {
     })
 }
 
-client.login(process.env.TOKEN)
+if(process.env.TOKEN) {
+    client.login(process.env.TOKEN)
+} else console.error('MISSING TOKEN ENVIRONMENT VARIABLE')
 
 export const commands : Collection<string, Command> = cmmnds
 export const database : MongoClient | undefined = db
