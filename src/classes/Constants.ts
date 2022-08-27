@@ -16,4 +16,5 @@ export const EMOJI: string = '!emoji'
 // Error Message constants
 export const DATABASEERRORMESSAGE: string = 'There was a problem connecting to the database. Please contact an administrator.'
 export const INTERACTIONERRORMESSAGE: string = 'There was an error while executing this command!'
+// Other Constants
 export const EMBEDCOLOR: ColorResolvable = 'LuminousVividPink'
