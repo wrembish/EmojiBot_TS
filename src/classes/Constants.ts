@@ -6,8 +6,8 @@
 import { ColorResolvable } from "discord.js"
 
 // MongoDB constants
-export const MONGODATABASE: string = 'ConversionMap'
-export const MAPCOLLECTION: string = 'Character'
+export const MONGODATABASE: string = 'EmojiBot'
+export const MAPCOLLECTION: string = 'Conversion'
 export const MESSAGESCOLLECTION: string = 'BuiltInMessage'
 export const CRONCOLLECTION: string = 'CronJob'
 // Command constants
