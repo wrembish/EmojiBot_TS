@@ -1,7 +1,7 @@
 import { Interaction } from 'discord.js'
 import Command from '../classes/Command'
 import DiscordEvent from '../classes/DiscordEvent'
-import { INTERACTIONERRORMESSAGE } from '../emojibot_files/constants'
+import { INTERACTIONERRORMESSAGE } from '../classes/Constants'
 import { commands } from '../index'
 
 export const event : DiscordEvent = new DiscordEvent(

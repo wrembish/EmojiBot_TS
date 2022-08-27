@@ -1,5 +1,5 @@
 import { EmbedBuilder, ModalSubmitInteraction } from 'discord.js'
-import { EMBEDCOLOR } from '../emojibot_files/constants'
+import { EMBEDCOLOR } from '../classes/Constants'
 import Command from '../classes/Command'
 
 // http://www.thecocktaildb.com

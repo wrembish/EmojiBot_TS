@@ -3,7 +3,7 @@ import * as fs from 'node:fs'
 import * as path from 'node:path'
 import { Awaitable, Client as DiscordClient, Collection, GatewayIntentBits } from 'discord.js'
 import { Collection as MongoCollection, Document, MongoClient, ServerApiVersion, WithId } from 'mongodb'
-import { MONGODATABASE, MAPCOLLECTION, MESSAGESCOLLECTION } from './emojibot_files/constants'
+import { MONGODATABASE, MAPCOLLECTION, MESSAGESCOLLECTION } from './classes/Constants'
 import Command from './classes/Command'
 import CronJob from './classes/CronJob'
 

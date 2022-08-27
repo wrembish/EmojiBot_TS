@@ -3,7 +3,7 @@ import * as path from 'node:path'
 import { EmbedBuilder, Message, REST } from 'discord.js'
 import { Collection as MongoCollection } from 'mongodb'
 import { RESTPostAPIApplicationCommandsJSONBody, Routes } from 'discord-api-types/v10'
-import { EMBEDCOLOR } from './constants'
+import { EMBEDCOLOR } from './Constants'
 
 /**
  * Converts the given string into a string of emojis

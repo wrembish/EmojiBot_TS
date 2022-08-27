@@ -1,8 +1,8 @@
 import { Collection, ModalSubmitInteraction } from 'discord.js'
 import * as fs from 'node:fs'
 import * as path from 'node:path'
-import { DATABASEERRORMESSAGE } from '../emojibot_files/constants'
-import { deployCommands } from '../emojibot_files/helpers'
+import { DATABASEERRORMESSAGE } from '../classes/Constants'
+import { deployCommands } from '../classes/Helpers'
 import Command from '../classes/Command'
 
 export const command : Command = new Command(

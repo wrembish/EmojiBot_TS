@@ -310,7 +310,7 @@ const conversionMap : any[] = [
   
   require('dotenv').config()
   import { MongoClient, ServerApiVersion } from 'mongodb'
-  import { MONGODATABASE, MAPCOLLECTION, MESSAGESCOLLECTION } from '../emojibot_files/constants'
+  import { MONGODATABASE, MAPCOLLECTION, MESSAGESCOLLECTION } from '../classes/Constants'
   
   if(process.env.MONGODB_URL) {
     const client = new MongoClient(process.env.MONGODB_URL, { serverApi  : ServerApiVersion.v1 })

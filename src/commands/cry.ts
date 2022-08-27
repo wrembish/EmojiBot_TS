@@ -1,5 +1,5 @@
 import { ModalSubmitInteraction } from 'discord.js'
-import { convert } from '../emojibot_files/helpers'
+import { convert } from '../classes/Helpers'
 import Command from '../classes/Command'
 
 export const command : Command = new Command(

@@ -3,8 +3,8 @@ import * as cron from 'node-cron'
 import { Collection as MongoCollection, Document, WithId } from 'mongodb'
 import { builtInMessages, cronJobs, database } from '../index'
 import DiscordEvent from '../classes/DiscordEvent'
-import { COMMANDCHAR, CRONCOLLECTION, DATABASEERRORMESSAGE, EMOJI , MONGODATABASE } from '../emojibot_files/constants'
-import { buildCronStr, convert, deleteCronJob, getDogFactsEmbed, getCatFactsEmbed } from '../emojibot_files/helpers'
+import { COMMANDCHAR, CRONCOLLECTION, DATABASEERRORMESSAGE, EMOJI , MONGODATABASE } from '../classes/Constants'
+import { buildCronStr, convert, deleteCronJob, getDogFactsEmbed, getCatFactsEmbed } from '../classes/Helpers'
 import CronJob from '../classes/CronJob'
 
 export const event : DiscordEvent = new DiscordEvent(

@@ -1,6 +1,6 @@
 import { ModalSubmitInteraction } from 'discord.js'
 import Command from '../classes/Command'
-import { DATABASEERRORMESSAGE } from '../emojibot_files/constants'
+import { DATABASEERRORMESSAGE } from '../classes/Constants'
 
 export const command : Command = new Command(
     'ahhh',
